@@ -1,0 +1,13 @@
+{
+  "name": "starknet-multi-cron",
+  "version": "1.0.0",
+  "main": "script.js",
+  "scripts": {
+    "start": "node script.js"
+  },
+  "dependencies": {
+    "starknet": "^7.6.4",
+    "dotenv": "^17.2.1",
+    "node-cron": "^4.2.1"
+  }
+}
