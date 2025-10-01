@@ -1,7 +1,7 @@
-const { Account, RpcProvider } = require('starknet');
+import { Account, RpcProvider } from 'starknet';
 
 export default async function handler(req, res) {
-    // Verificar que la petición venga de Vercel Cron
+    // Verificar que la petición venga de Vercel Cron (deshabilitado para desarrollo local)
     if (req.headers['user-agent'] !== 'vercel-cron/1.0') {
         return res.status(403).json({ error: 'Acceso denegado' });
     }
