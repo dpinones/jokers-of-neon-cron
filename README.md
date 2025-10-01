@@ -1,101 +1,185 @@
-# Starknet Multi-Cron
+# Starknet Cron Job - Vercel
 
-Sistema de tareas programadas (crons) para interactuar con la blockchain de Starknet. Permite ejecutar múltiples funciones de smart contracts de forma automatizada con intervalos configurables.
+Cron job serverless para ejecutar transacciones automáticas en Starknet, desplegado en Vercel.
 
-## Características
+## 🚀 Características
 
-- **Multi-cron**: Soporte para múltiples tareas programadas con diferentes intervalos
-- **Starknet Integration**: Ejecuta transacciones y monitorea balances en Starknet
-- **Configuración flexible**: Intervalos y parámetros configurables via variables de entorno
-- **Deploy en Render**: Optimizado para ejecutarse como Background Worker en Render
+- Ejecución automática diaria a las **06:00 UTC**
+- Serverless (Vercel Functions)
+- Interacción con contratos Starknet
+- Logging de transacciones
+- Gratis en plan Hobby de Vercel
 
-## Instalación
+## 📋 Requisitos
 
+- Cuenta en [Vercel](https://vercel.com)
+- Cuenta en Starknet con fondos
+- Repositorio en GitHub/GitLab/Bitbucket
+
+## 🛠️ Instalación
+
+1. **Clona el repositorio**
 ```bash
-# Instalar dependencias
+git clone <tu-repo>
+cd jokers-of-neon-cron
+```
+
+2. **Instala dependencias**
+```bash
 npm install
-
-# Configurar variables de entorno
-cp .env.example .env
 ```
 
-## Configuración
-
-Edita el archivo `.env` con tus valores:
-
-```env
-# Configuración de cuenta Starknet
-PRIVATE_KEY=0xtu_clave_privada
-ADDRESS=0xtu_direccion
-RPC_URL=https://rpc.starknet-testnet.lava.build
-
-# Configuración de crons
-CRON1_INTERVAL_MINUTES=5
-CRON1_CONTRACT_ADDRESS=0xcontrato1
-```
+## ⚙️ Configuración
 
 ### Variables de Entorno
+
+Configura estas variables en el dashboard de Vercel:
 
 | Variable | Descripción | Ejemplo |
 |----------|-------------|---------|
 | `PRIVATE_KEY` | Clave privada de tu cuenta Starknet | `0x123...` |
 | `ADDRESS` | Dirección de tu cuenta Starknet | `0x456...` |
-| `RPC_URL` | Endpoint RPC de Starknet | `https://rpc.starknet-testnet.lava.build` |
-| `CRON1_INTERVAL_MINUTES` | Intervalo en minutos para el primer cron | `5` |
-| `CRON1_CONTRACT_ADDRESS` | Contrato específico para el primer cron | `0xabc...` |
+| `RPC_URL` | URL del RPC de Starknet | `https://starknet-mainnet.public.blastapi.io` |
+| `CRON1_CONTRACT_ADDRESS` | Dirección del contrato a invocar | `0x789...` |
 
-## Uso
+### Horario del Cron
+
+El cron está configurado en [vercel.json](vercel.json):
+
+```json
+{
+  "crons": [
+    {
+      "path": "/api/cron",
+      "schedule": "0 6 * * *"
+    }
+  ]
+}
+```
+
+**Schedule actual**: `0 6 * * *` = Todos los días a las 06:00 UTC
+
+Para cambiar el horario, modifica la expresión cron. Ejemplos:
+- `0 0 * * *` - Medianoche UTC
+- `0 12 * * *` - Mediodía UTC
+- `0 */6 * * *` - Cada 6 horas
+
+Valida expresiones en [crontab.guru](https://crontab.guru)
+
+## 🚀 Despliegue en Vercel
+
+### Opción 1: Dashboard de Vercel
+
+1. Ve a [vercel.com](https://vercel.com) e inicia sesión
+2. Click en **"Add New Project"**
+3. Importa tu repositorio de Git
+4. Vercel detectará automáticamente la configuración
+5. Añade las variables de entorno en **"Environment Variables"**
+6. Click en **"Deploy"**
+
+### Opción 2: Vercel CLI
 
 ```bash
-# Ejecutar el sistema de crons
-npm start
+# Instala Vercel CLI
+npm i -g vercel
+
+# Login
+vercel login
+
+# Despliega
+vercel --prod
 ```
 
-El sistema iniciará todos los crons configurados y mantendrá el proceso corriendo para ejecutar las tareas programadas.
+Añade las variables de entorno:
+```bash
+vercel env add PRIVATE_KEY
+vercel env add ADDRESS
+vercel env add RPC_URL
+vercel env add CRON1_CONTRACT_ADDRESS
+```
 
-## Arquitectura
+## 📊 Monitoreo
 
-- **script.js**: Archivo principal que contiene la lógica de crons y funciones de Starknet
-- **package.json**: Configuración del proyecto y dependencias
-- **.env**: Variables de entorno (crear desde .env.example)
+- **Logs**: Ve a tu proyecto en Vercel → Functions → `/api/cron`
+- **Transacciones**: Revisa [Starkscan](https://starkscan.co) con el hash devuelto
+- **Errores**: Revisa los logs en el dashboard de Vercel
 
-### Funciones Disponibles
+## 🧪 Testing Local
 
-- `ejecutarFuncionPrincipal()`: Ejecuta la función `increase_balance` en el contrato especificado
-- Fácilmente extensible para agregar más funciones según necesidades
+```bash
+# Instala Vercel CLI
+npm i -g vercel
 
-## Dependencias
+# Crea archivo .env local
+cp .env.example .env
+# Edita .env con tus valores
 
-- **starknet**: SDK para interactuar con Starknet
-- **dotenv**: Gestión de variables de entorno
-- **node-cron**: Programación de tareas
+# Inicia servidor local
+vercel dev
+```
 
-## Deploy en Render
+Prueba el endpoint:
+```bash
+curl http://localhost:3000/api/cron \
+  -H "user-agent: vercel-cron/1.0"
+```
 
-1. Conecta tu repositorio Git a Render
-2. Crea un nuevo **Background Worker**
-3. Configura:
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-   - **Environment Variables**: Agrega todas las variables del archivo .env
+## 📁 Estructura del Proyecto
 
-## Desarrollo
+```
+.
+├── api/
+│   └── cron.js          # Función serverless del cron job
+├── vercel.json          # Configuración de Vercel y crons
+├── package.json         # Dependencias
+├── .env.example         # Ejemplo de variables de entorno
+└── README.md            # Este archivo
+```
 
-Para agregar nuevas tareas cron, modifica el array `tasks` en `script.js`:
+## 🔒 Seguridad
+
+- La función verifica que las peticiones vengan de Vercel (`user-agent: vercel-cron/1.0`)
+- Las claves privadas se manejan como variables de entorno (nunca en el código)
+- Solo el cron de Vercel puede invocar la función
+
+## 📝 Notas
+
+- **Límites del plan Hobby**: Máximo 2 cron jobs por cuenta, ejecución una vez al día
+- **Duración**: Funciones limitadas a 10 segundos en Hobby (60s en Pro)
+- **Precisión**: El cron puede ejecutarse entre 06:00 y 06:59 UTC (no exacto)
+- **Invocaciones**: 100,000 gratis al mes en plan Hobby
+
+## 🔧 Personalización
+
+Para modificar la lógica del cron, edita [api/cron.js](api/cron.js):
 
 ```javascript
-const tasks = [
-    {
-        name: 'Mi Nueva Tarea',
-        schedule: '*/10 * * * *', // Cada 10 minutos
-        func: () => miFuncion()
-    }
-];
+// Cambiar el entrypoint o calldata
+const myCall = {
+    contractAddress: contractAddress,
+    entrypoint: 'tu_funcion',  // ← Cambia aquí
+    calldata: [args]            // ← Y aquí
+};
 ```
 
-## Formato de Schedule
+## 📚 Recursos
 
-El formato de cron usa la sintaxis estándar:
-- `*/5 * * * *` - Cada 5 minutos
-- `0 */2 * * *` - Cada 2 horas
-- `0 0 * * *` - Diariamente a medianoche
+- [Documentación de Vercel Cron](https://vercel.com/docs/cron-jobs)
+- [Starknet.js Docs](https://www.starknetjs.com/)
+- [Starkscan Explorer](https://starkscan.co)
+- [Crontab Guru](https://crontab.guru) - Validador de expresiones cron
+
+## 🐛 Troubleshooting
+
+### Error: "Acceso denegado"
+La función solo acepta peticiones de Vercel Cron. Para testing local, usa `vercel dev`.
+
+### Error: "Configuración incompleta"
+Verifica que todas las variables de entorno estén configuradas en Vercel.
+
+### Error: "Transaction failed"
+Revisa que tu cuenta tenga fondos suficientes y que el contrato sea correcto.
+
+## 📄 Licencia
+
+MIT
