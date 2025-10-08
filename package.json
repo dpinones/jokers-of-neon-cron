@@ -6,7 +6,7 @@
     "start": "node script.js"
   },
   "dependencies": {
-    "starknet": "^7.6.4",
+    "starknet": "8.1.2",
     "dotenv": "^17.2.1",
     "node-cron": "^4.2.1"
   }
