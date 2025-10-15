@@ -42,7 +42,7 @@ async function ejecutarFuncionPrincipal(contractAddress) {
 const tasks = [
     {
         name: 'Cron1 - Principal',
-        schedule: '30 18 * * *',
+        schedule: '45 18 * * *',
         func: () => ejecutarFuncionPrincipal(process.env.CRON1_CONTRACT_ADDRESS)
     },
 ];
