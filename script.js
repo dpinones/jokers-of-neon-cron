@@ -14,18 +14,25 @@ if (!privateKey || !address || !rpcUrl) {
 }
 
 const provider = new RpcProvider({ nodeUrl: rpcUrl });
-const account = new Account(provider, address, privateKey);
+const account = new Account({
+    provider,
+    address,
+    signer: privateKey
+});
 
 // Funci�n principal (ejemplo: invocar transfer)
 async function ejecutarFuncionPrincipal(contractAddress) {
     try {
         const myCall = {
             contractAddress: contractAddress,
-            entrypoint: 'increase_balance',
-            calldata: [5]
+            entrypoint: 'generate_daily_missions',
+            calldata: []
         };
-        const { transaction_hash } = await account.execute(myCall);
-        console.log(`Tx principal: https://starkscan.co/tx/${transaction_hash}`);
+        const nonce = await account.getNonce();
+        const { transaction_hash } = await account.execute(myCall, {
+            nonce,
+        });
+        console.log(`tx: ${transaction_hash}`);
     } catch (error) {
         console.error('Error en funci�n principal:', error);
     }
@@ -35,7 +42,7 @@ async function ejecutarFuncionPrincipal(contractAddress) {
 const tasks = [
     {
         name: 'Cron1 - Principal',
-        schedule: `*/${process.env.CRON1_INTERVAL_MINUTES || 5} * * * *`,
+        schedule: '1 0 * * *',
         func: () => ejecutarFuncionPrincipal(process.env.CRON1_CONTRACT_ADDRESS)
     },
 ];
