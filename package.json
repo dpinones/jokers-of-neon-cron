@@ -1,13 +1,19 @@
 {
   "name": "starknet-multi-cron",
   "version": "1.0.0",
-  "main": "script.js",
+  "main": "dist/script.js",
   "scripts": {
-    "start": "node script.js"
+    "build": "tsc",
+    "start": "node dist/script.js",
+    "dev": "tsc && node dist/script.js"
   },
   "dependencies": {
     "starknet": "8.1.2",
     "dotenv": "^17.2.1",
     "node-cron": "^4.2.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/node": "^20.0.0"
   }
 }
