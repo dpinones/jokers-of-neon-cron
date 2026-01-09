@@ -1,11 +1,24 @@
 import 'dotenv/config';
 import { Account, RpcProvider } from 'starknet';
+import { createClient } from '@supabase/supabase-js';
 import cron from 'node-cron';
 
 interface CronTask {
     name: string;
     schedule: string;
     func: () => Promise<void> | void;
+}
+
+interface UserPreferences {
+    wallet: string;
+    push_daily_missions_enabled: boolean;
+    push_reminders_enabled: boolean;
+    push_events_enabled: boolean;
+    push_daily_packs_enabled: boolean;
+    push_extra1_enabled: boolean;
+    push_extra2_enabled: boolean;
+    timezone: string;
+    language: string;
 }
 
 const privateKey = process.env.PRIVATE_KEY;
@@ -25,6 +38,11 @@ const account = new Account({
     signer: privateKey
 });
 
+const supabase = createClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!
+);
+
 async function generateDailyMissions(): Promise<void> {
     try {
         const myCall = {
@@ -42,8 +60,23 @@ async function generateDailyMissions(): Promise<void> {
 
 async function sendNotifications(): Promise<void> {
     try {
-        // TODO: Agregar lógica de notificaciones
         console.log('[Notifications] Ejecutando...');
+
+        const { data, error } = await supabase
+            .from('user_preferences')
+            .select('wallet, push_reminders_enabled');
+
+        if (error) {
+            throw error;
+        }
+
+        const users = data as Pick<UserPreferences, 'wallet' | 'push_reminders_enabled'>[];
+
+        for (const user of users) {
+            console.log(`wallet: ${user.wallet}, push_reminders_enabled: ${user.push_reminders_enabled}`);
+        }
+
+        console.log(`[Notifications] ${users.length} usuarios procesados`);
     } catch (error) {
         console.error('[Notifications] Error:', error);
     }
