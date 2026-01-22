@@ -39,3 +39,15 @@ export interface NotificationMessage {
     title: string;
     body: string;
 }
+
+export interface NotificationLog {
+    id: string;
+    wallet: string;
+    notification_type: string;
+    sent_at: string;
+}
+
+export interface FreePackResponse {
+    recipient: string;
+    next_free_pack_timestamp: number;
+}
