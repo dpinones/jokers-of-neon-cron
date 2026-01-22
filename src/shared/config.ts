@@ -28,8 +28,14 @@ export const supabase = createClient(
     process.env.SUPABASE_ANON_KEY!
 );
 
-const firebaseCredentialsPath = process.env.FIREBASE_CREDENTIALS_PATH || './firebase-credentials.json';
-const serviceAccount = JSON.parse(readFileSync(join(process.cwd(), firebaseCredentialsPath), 'utf-8'));
+// Soporta credenciales como JSON string (variable de entorno) o como archivo
+let serviceAccount;
+if (process.env.FIREBASE_CREDENTIALS_JSON) {
+    serviceAccount = JSON.parse(process.env.FIREBASE_CREDENTIALS_JSON);
+} else {
+    const firebaseCredentialsPath = process.env.FIREBASE_CREDENTIALS_PATH || './firebase-credentials.json';
+    serviceAccount = JSON.parse(readFileSync(join(process.cwd(), firebaseCredentialsPath), 'utf-8'));
+}
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
